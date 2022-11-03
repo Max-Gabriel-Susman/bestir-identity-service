@@ -3,12 +3,12 @@ name: ci
 on: 
   - push
 
-env: 
+#env: 
 
 jobs: 
   build: 
     runs-on: ubuntu-latest 
-    env: 
+    #env: 
     steps: 
       - name: Hello World
         run: echo "hello world"
