@@ -1,0 +1,14 @@
+name: ci 
+
+on: 
+  - push
+
+env: 
+
+jobs: 
+  build: 
+    runs-on: ubuntu-latest 
+    env: 
+    steps: 
+      - name: Hello World
+        run: echo "hello world"
