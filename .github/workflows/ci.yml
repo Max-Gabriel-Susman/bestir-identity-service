@@ -14,5 +14,6 @@ jobs:
       - name: Hello World
         run: echo "hello world"
 
-      - name: Test
-        run: make test
+      # okay, so we're going to need to determine how to get make on our builld image somehow 
+      #- name: Test
+      #  run: make test
