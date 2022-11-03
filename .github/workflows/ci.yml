@@ -10,5 +10,9 @@ jobs:
     runs-on: ubuntu-latest 
     #env: 
     steps: 
+      # it seems like we're going to eventually want to run these 
       - name: Hello World
         run: echo "hello world"
+
+      - name: Test
+        run: make test
