@@ -2,7 +2,7 @@
 
 FROM golang:1.16-alpine
 
-ARG PROJECT_BINARY=rs-identity-service
+ARG PROJECT_BINARY=bestir-identity-service
 ARG PROJECT_BUILD_DIR=./build/bin
 
 WORKDIR /app
@@ -13,9 +13,15 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 
-COPY *.go ./cmd/bestir-identity-service
-COPY *.go ./internal/
-#  cmd/bestir-identity-service
+# these are previous failed attempts to copy subdirectories of the working directory of docker invocation into the working 
+# directory of 
+# COPY *.go ./cmd/bestir-identity-service
+# COPY *.go ./internal/
+# cmd/bestir-identity-service
+
+# temporary measure
+COPY *.go ./
+
 RUN go build -o /docker-gs-ping
 
 EXPOSE 8080
