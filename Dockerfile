@@ -22,8 +22,8 @@ RUN go mod download
 # temporary measure
 COPY *.go ./
 
-RUN go build -o /docker-gs-ping
+RUN go build -o /bestir-identity-service
 
 EXPOSE 8080
 
- CMD [ "/docker-gs-ping" ]
+ CMD [ "/bestir-identity-service" ]

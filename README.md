@@ -1,6 +1,6 @@
 # Bestir Identity Service 
 
-Handles the creation and management of accounts and their assets
+Handles the lifecycle of accounts on the bestir network
 
 ### Roadmap 
 
