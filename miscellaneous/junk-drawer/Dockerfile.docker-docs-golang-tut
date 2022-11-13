@@ -3,7 +3,6 @@
 # okay, let's make a volume mount and figure out how to mount a mysql instance to it, preferably the local-db-up instance
 
 # also, it would be preferable to replace the base image w/ ubuntu @ some point, let's just do that now
-# you know what, fuck it, I can play around with that shit later
 FROM golang:1.16-alpine
 
 ARG PROJECT_BINARY=bestir-identity-service
@@ -31,7 +30,3 @@ RUN go build -o /bestir-identity-service
 EXPOSE 8080
 
  CMD [ "/bestir-identity-service" ]
-
- # ok fuck all this bullshit, let's just find a project that's already doing all of this shit
-
- 
