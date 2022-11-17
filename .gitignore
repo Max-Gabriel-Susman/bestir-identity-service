@@ -1,2 +1,4 @@
 vendor/
 miscelaneas/
+cockroach-data/
+spain.go
