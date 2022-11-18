@@ -32,6 +32,4 @@ EXPOSE 8080
 
  CMD [ "/bestir-identity-service" ]
 
- # ok fuck all this bullshit, let's just find a project that's already doing all of this shit
-
  

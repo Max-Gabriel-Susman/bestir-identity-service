@@ -13,10 +13,12 @@ var _ http.Handler = (*web.App)(nil)
 func API() *web.App {
 	app := web.NewApp()
 
-	ag := account.AccountGroup{}
-	app.Handle("GET", "/account", ag.GetAccounts)
+	accountAPI := account.NewAPI()
+	// userAPI := user.NewAPI()
 
 	// we'll want more robust registry down hither at a later point in time
 
+	// UserEndpoints(app, userAPI)
+	AccountEndpoints(app, accountAPI)
 	return app
 }
