@@ -6,6 +6,7 @@ require (
 	github.com/badoux/checkmail v1.2.1
 	github.com/cockroachdb/cockroach-go/v2 v2.2.18
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jinzhu/gorm v1.9.16
