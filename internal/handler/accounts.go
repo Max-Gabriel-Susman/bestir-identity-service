@@ -18,6 +18,10 @@ type accountGroup struct {
 	*account.API
 }
 
+type ListAccountsResponse struct {
+	Accounts []account.Account `json:"accounts`
+}
+
 func AccountEndpoints(app *web.App, api *account.API) {
 	ag := accountGroup{API: api}
 
@@ -26,10 +30,15 @@ func AccountEndpoints(app *web.App, api *account.API) {
 
 func (ag accountGroup) ListAccounts(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 
-	// accounts, err := ag.GetAccounts()
+	accounts, err := ag.API.ListAccounts(ag.API.Store.Conn)
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("you got dem accounts fella")
-	return nil
+	return web.Respond(ctx, w, ListAccountsResponse{
+		Accounts: accounts,
+	}, http.StatusOK)
 }
 
 func (ag accountGroup) GetAccount(ctx context.Context, w http.ResponseWriter, r *http.Request) error {

@@ -1,5 +1,5 @@
 package db
-
+/*
 import (
 	"context"
 	"fmt"
@@ -89,7 +89,7 @@ func deleteAccounts(db *gorm.DB, accountIDs []uuid.UUID) error {
 	return nil
 }
 
-func seed() {
+func GormSeed() {
 
 	db, err := gorm.Open(postgres.Open(os.Getenv("DATABASE_URL")+"&application_name=$ docs_simplecrud_gorm"), &gorm.Config{})
 	if err != nil {
@@ -146,13 +146,14 @@ func seed() {
 	// Delete all accounts created by the earlier call to `addAccounts`
 	// To handle potential transaction retry errors, we wrap the call
 	// to `deleteAccounts` in `crdbgorm.ExecuteTx`
-	//if err := crdbgorm.ExecuteTx(context.Background(), db, nil,
-	//	func(tx *gorm.DB) error {
-	//		return deleteAccounts(db, acctIDs)
-	//	},
-	//); err != nil {
-	//	// For information and reference documentation, see:
-	//	//   https://www.cockroachlabs.com/docs/stable/error-handling-and-troubleshooting.html
-	//	fmt.Println(err)
-	//}
+	if err := crdbgorm.ExecuteTx(context.Background(), db, nil,
+		func(tx *gorm.DB) error {
+			return deleteAccounts(db, acctIDs)
+		},
+	); err != nil {
+		// For information and reference documentation, see:
+		//   https://www.cockroachlabs.com/docs/stable/error-handling-and-troubleshooting.html
+		fmt.Println(err)
+	}
 }
+*/

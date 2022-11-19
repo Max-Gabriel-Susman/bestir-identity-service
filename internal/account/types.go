@@ -1,7 +1,10 @@
 package account
 
+import "github.com/google/uuid"
+
 type Account struct {
-	ID string `json:"id"`
+	ID      uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()"`
+	Balance int
 }
 
 type AccountGroup struct {

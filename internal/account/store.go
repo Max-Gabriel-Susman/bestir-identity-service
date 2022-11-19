@@ -1,7 +1,20 @@
 package account
 
-// we'll have to change this up a bit more to make it work
+import (
+	"github.com/jackc/pgx/v4"
+	"gorm.io/gorm"
+)
+
 type CockroachDBStorage struct {
-	// conn *dbr.Connection
-	// sess *dbr.Session
+	Conn *pgx.Conn
+}
+
+func NewCockroachDBStorage(conn *pgx.Conn) *CockroachDBStorage {
+	return &CockroachDBStorage{Conn: conn}
+}
+
+func (c *CockroachDBStorage) ListAccounts(db *gorm.DB) []Account {
+	var accounts []Account
+	db.Find(&accounts)
+	return accounts
 }

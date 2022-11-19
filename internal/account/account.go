@@ -1,11 +1,15 @@
 package account
 
+import (
+	"github.com/jackc/pgx/v4"
+)
+
 type API struct {
 	// Logger *bestirlog.Logger
-	// Store *CockroachDBStorage
+	Store CockroachDBStorage
 }
 
 // we may want to parameterize storage and logging later
-func NewAPI() *API {
-	return &API{}
+func NewAPI(conn *pgx.Conn) *API {
+	return &API{Store: *NewCockroachDBStorage(conn)}
 }

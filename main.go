@@ -3,17 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/Max-Gabriel-Susman/bestir-identity-service/db"
 	"github.com/Max-Gabriel-Susman/bestir-identity-service/internal/handler"
+	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 )
 
 var (
-	ssmParamas []byte
+	ssmParams []byte
 )
 
 const (
@@ -21,7 +24,10 @@ const (
 	exitCodeInterrupt = 2
 )
 
-// I need to come back an grok all of this shit later
+func spain() {
+	db.PGXSeed()
+}
+
 func main() {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
@@ -49,9 +55,22 @@ func main() {
 func run(ctx context.Context, _ []string) error {
 	// cfg and setup shit right hurr
 
-	// Start API Service
-	h := handler.API()
+	// Read in connection string
+	config, err := pgx.ParseConfig(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	config.RuntimeParams["application_name"] = "$ docs_simplecrud_gopgx"
+	conn, err := pgx.ConnectConfig(context.Background(), config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close(context.Background())
 
+	// we gott reconfigure the service to use pgx now
+	h := handler.API(handler.Deps{Conn: conn})
+
+	// Start API Service
 	api := http.Server{
 		Handler: h,
 		// Addr:              "127.0.0.1:80",

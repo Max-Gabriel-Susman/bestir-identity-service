@@ -10,10 +10,10 @@ import (
 var _ http.Handler = (*web.App)(nil)
 
 // maybe we'll add gitsha and other params later
-func API() *web.App {
+func API(d Deps) *web.App {
 	app := web.NewApp()
 
-	accountAPI := account.NewAPI()
+	accountAPI := account.NewAPI(d.Conn) // we need to add a logger
 	// userAPI := user.NewAPI()
 
 	// we'll want more robust registry down hither at a later point in time
