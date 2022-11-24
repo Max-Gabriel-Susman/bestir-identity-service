@@ -1,22 +1,20 @@
+// Package database provides support for accessing the database.
 package database
 
 import (
-	// "database/sql"
-	// sqltrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/database/sql"
-	// "gopkg.in/DataDog/dd-trace-go.v1/ddtrace/ext"
-	// "gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
-	// postgres "github.com/jackc/pgx/v4"
 	"context"
 	"database/sql"
-	"database/sql/driver"
 	"fmt"
 
-	dbr "github.com/gocraft/dbr/v2"
+	"github.com/go-sql-driver/mysql"
+	"github.com/gocraft/dbr/v2"
 	"github.com/gocraft/dbr/v2/dialect"
 	sqltrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/database/sql"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/ext"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
-// Config is used to connect to db
+// Config is the required properties to use the database.
 type Config struct {
 	User     string
 	Password string
@@ -25,69 +23,36 @@ type Config struct {
 	Params   string
 }
 
-// Opens a database connection with configuration
+// Open knows how to open a database connection based on the configuration.
 func Open(cfg Config, serviceName string) (*sql.DB, error) {
-	sqltrace.Register("postgres", &PostgresDriver{},
+	sqltrace.Register("mysql", &mysql.MySQLDriver{},
 		sqltrace.WithServiceName(serviceName),
 		sqltrace.WithAnalytics(true),
 	)
 	dsn := DSN(cfg)
-	return sqltrace.Open("postgres", dsn)
-}
-
-type PostgresDriver struct{}
-
-// func (pgd PostgresDriver) Open(name string) (PostgresConnection, error) {
-func (pgd PostgresDriver) Open(dsn string) (driver.Conn, error) {
-	cfg, err := ParseDSN(dsn)
-	if err != nil {
-		return nil, err
-	}
-	c := &connector{
-		cfg: cfg,
-	}
-	return c.Connect(context.Background())
+	return sqltrace.Open("mysql", dsn)
 }
 
 func NewDBR(db *sql.DB) *dbr.Connection {
-	return &dbr.Connection{DB: db, EventReceiver: &dbr.NullEventReceiver{}, Dialect: dialect.PostgreSQL}
+	return &dbr.Connection{DB: db, EventReceiver: &dbr.NullEventReceiver{}, Dialect: dialect.MySQL}
 }
 
-// Data Source Name - used to request a connection to a data source
 func DSN(cfg Config) string {
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?%s", cfg.User, cfg.Password, cfg.Host, cfg.Name, cfg.Params)
 }
 
-// TRASH HEAP
+// StatusCheck returns nil if it can successfully talk to the database. It
+// returns a non-nil error otherwise.
+func StatusCheck(ctx context.Context, db *sql.DB) error {
+	if span, ok := tracer.SpanFromContext(ctx); ok {
+		span.SetTag(ext.ManualDrop, true)
+	}
 
-/*
-
-type PostgresConnection struct {
+	// Run a simple query to determine connectivity. The db has a "Ping" method
+	// but it can false-positive when it was previously able to talk to the
+	// database but the database has since gone away. Running this query forces a
+	// round trip to the database.
+	const q = `SELECT true`
+	var tmp bool
+	return db.QueryRowContext(ctx, q).Scan(&tmp)
 }
-
-
-func (pgc PostgresConnection) Prepare(query string) (Stmt, error) {
-
-	return Stmt{}, nil
-}
-
-func (pgc PostgresConnection) Close() error {
-	return nil
-}
-
-func (pgc PostgresConnection) Begin() (PostgresTransaction, error) {
-	return PostgresTransaction{}, nil
-}
-
-type PostgresTransaction struct {
-}
-
-func (pgt PostgresTransaction) Commit() error {
-	return nil
-}
-
-func (pgt PostgresTransaction) Rollback() error {
-	return nil
-}
-
-*/
