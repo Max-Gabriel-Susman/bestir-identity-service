@@ -13,6 +13,7 @@ import (
 	"github.com/Max-Gabriel-Susman/bestir-identity-service/internal/handler"
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 var (
@@ -53,7 +54,52 @@ func main() {
 }
 
 func run(ctx context.Context, _ []string) error {
+	// aws shit, currently unsupported, but soon
+	//wsCfg, err := aws.NewConfig(ctx)
+	//f err != nil {
+	//	return errors.Wrap(err, "could not create aws sdk config")
+	//
+
+	//f _, ok := os.LookupEnv("SSM_DISABLE"); !ok {
+	//	if err := awsParseSSMParams(ctx, awsCfg, ssmParams); err != nil {
+	//		return err 
+	//	}
+	//
+
+	// open api shit for documentation 
+
 	// cfg and setup shit right hurr
+	var cfg struct {
+		ServiceName string `env:"SERVICE_NAME" envDefault:"bp-billing-service"`
+		Env string `env:"ENV" envDefault:"local"`
+		Database struct {
+			User string `env:"BILLING_DB_USER,required"`
+			Pass string `env:"BILLING_DB_PASSWORD,required"`
+			Host string `env:"BILLING_DB_HOST"`
+			Port string `env:"BILLING_DB_PORT envDefault:"3306"`
+			DBName string `env:"BILLING_DB_NAME" envDefault:"billing"`
+			Params string `env:"BILLING_DB_PARAM_OVERRIDES envDefault:"parseTime=true"`
+		}
+		Datadog struct {
+			Disable bool `env:"DD_DISABLE"`
+		}
+	}
+
+	db, err := database.Open(database.Config{
+		User: cfg.Database.User,
+		Password: cfg.Database.Pass,
+		Host: cfg.Database.Host, 
+		Name: cfg.Database.DBName,
+		Params: cfg.Database.Params,
+	}, cfg.ServiceName)
+	if err != nil {
+		return errors.Wrap(err, "connecting to db")
+	}
+	defer func() {
+		// log.info(ctx, "stopping database")
+		db.Close()
+	}
+
 
 	// Read in connection string
 	config, err := pgx.ParseConfig(os.Getenv("DATABASE_URL"))
