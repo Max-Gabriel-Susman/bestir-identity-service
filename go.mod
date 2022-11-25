@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/DataDog/datadog-go v4.8.2+incompatible
 	github.com/Max-Gabriel-Susman/bestir-go-kit v0.0.0-20221124193531-e4525ee56b7f
+	github.com/caarlos0/env/v6 v6.10.1
 	github.com/cockroachdb/cockroach-go/v2 v2.2.18
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-sql-driver/mysql v1.6.0
