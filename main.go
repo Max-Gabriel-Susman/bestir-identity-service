@@ -101,7 +101,7 @@ func run(ctx context.Context, _ []string) error {
 		return errors.Wrap(err, "connecting to db")
 	}
 	defer func() {
-		log.info(ctx, "stopping database")
+		zl.Info(ctx, "stopping database")
 		db.Close()
 	}
 

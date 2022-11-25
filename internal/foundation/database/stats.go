@@ -14,10 +14,10 @@ import (
 type StatsReporter struct {
 	db  *sql.DB
 	ddc *statsd.Client
-	lg  *rslog.ZapLogger
+	lg  *bestirlog.ZapLogger
 }
 
-func NewStatsReporter(db *sql.DB, ddc *statsd.Client, lg *rslog.ZapLogger) *StatsReporter {
+func NewStatsReporter(db *sql.DB, ddc *statsd.Client, lg *bestirlog.ZapLogger) *StatsReporter {
 	return &StatsReporter{db: db, ddc: ddc, lg: lg}
 }
 

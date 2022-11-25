@@ -3,8 +3,11 @@ module github.com/Max-Gabriel-Susman/bestir-identity-service
 go 1.17
 
 require (
+	github.com/DataDog/datadog-go v4.8.2+incompatible
+	github.com/Max-Gabriel-Susman/bestir-go-kit v0.0.0-20221124193531-e4525ee56b7f
 	github.com/cockroachdb/cockroach-go/v2 v2.2.18
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gocraft/dbr/v2 v2.7.3
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v4 v4.17.2
@@ -17,7 +20,6 @@ require (
 
 require (
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.0.0-20211129110424-6491aa3bf583 // indirect
-	github.com/DataDog/datadog-go v4.8.2+incompatible // indirect
 	github.com/DataDog/datadog-go/v5 v5.0.2 // indirect
 	github.com/DataDog/sketches-go v1.2.1 // indirect
 	github.com/Microsoft/go-winio v0.5.1 // indirect

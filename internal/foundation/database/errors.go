@@ -11,15 +11,15 @@ import (
 )
 
 func ErrNotFound(err error) error {
-	return rserror.WithStatusCode(err, http.StatusNotFound)
+	return bestirerror.WithStatusCode(err, http.StatusNotFound)
 }
 
 func ErrDuplicateUnique(err error) error {
-	return rserror.WithCodeAndMessage(err, http.StatusConflict, err.Error())
+	return bestirerror.WithCodeAndMessage(err, http.StatusConflict, err.Error())
 }
 
 func ErrForeignKeyConstraint(err error) error {
-	return rserror.WithCodeAndMessage(err, http.StatusBadRequest, "foreign key constraint fails")
+	return bestirerror.WithCodeAndMessage(err, http.StatusBadRequest, "foreign key constraint fails")
 }
 
 func ClassifyError(err error) error {
