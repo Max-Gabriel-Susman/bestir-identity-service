@@ -1,10 +1,8 @@
 package account
 
-import (
-	"github.com/jackc/pgx/v4"
-	"gorm.io/gorm"
-)
+// "github.com/jackc/pgx/v4" // cockroach my love, we will meet again
 
+/*
 type CockroachDBStorage struct {
 	Conn *pgx.Conn
 }
@@ -18,3 +16,4 @@ func (c *CockroachDBStorage) ListAccounts(db *gorm.DB) []Account {
 	db.Find(&accounts)
 	return accounts
 }
+*/
