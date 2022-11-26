@@ -138,6 +138,7 @@ func run(ctx context.Context, _ []string) error {
 	// 	return err
 	// }
 
+	// dsn: usr:identity@tcp(127.0.0.1:3306)/identity
 	db, err := database.Open(database.Config{
 		User:     cfg.Database.User,
 		Password: cfg.Database.Pass,

@@ -40,7 +40,8 @@ func NewDBR(db *sql.DB) *dbr.Connection {
 }
 
 func DSN(cfg Config) string {
-	return fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?%s", cfg.User, cfg.Password, cfg.Host, cfg.Name, cfg.Params)
+	// return fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?%s", cfg.User, cfg.Password, cfg.Host, cfg.Name, cfg.Params)
+	return fmt.Sprintf("%s:%s@tcp(%s:3306)/%s", cfg.User, cfg.Password, cfg.Host, cfg.Name)
 }
 
 // StatusCheck returns nil if it can successfully talk to the database. It
