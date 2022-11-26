@@ -8,13 +8,21 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/Max-Gabriel-Susman/bestir-identity-service/db"
 	"github.com/Max-Gabriel-Susman/bestir-identity-service/internal/foundation/database"
 	"github.com/Max-Gabriel-Susman/bestir-identity-service/internal/handler"
 	env "github.com/caarlos0/env/v6"
 	"github.com/pkg/errors"
+
+	"go.uber.org/zap"
 )
 
 var (
+	GitSHA = "~git~" // populated with ldflags at build time(wtf is an ldflag?)
+
+	// File ssm-params.yml contains precomputed data
+	// procedure is documented @ https://blog.carlmjohnson.net/post/2021/how-to-use-go-embed/
+	//--+-go:embed ssm-params.yml(not implemented yet)
 	ssmParams []byte
 )
 
@@ -22,6 +30,10 @@ const (
 	exitCodeErr       = 1
 	exitCodeInterrupt = 2
 )
+
+func spain() {
+	db.InitializeDB()
+}
 
 func main() {
 	ctx := context.Background()
@@ -77,15 +89,54 @@ func run(ctx context.Context, _ []string) error {
 		Datadog struct {
 			Disable bool `env:"DD_DISABLE"`
 		}
+		Migration struct {
+			Enable bool `env:"ENABLE_MIGRATE"`
+		}
 	}
 	if err := env.Parse(&cfg); err != nil {
 		return errors.Wrap(err, "parsing configuration")
 	}
 	// cfg.Datadog.Disable = true
 
-	// z = z.With(
-	// 	zap.
-	// )
+	// Create base logger
+	z, err := zap.Config{
+		Level:            zap.NewAtomicLevelAt(zap.DebugLevel),
+		Development:      false,
+		Encoding:         "json",
+		EncoderConfig:    zap.NewProductionEncoderConfig(),
+		OutputPaths:      []string{"stderr"},
+		ErrorOutputPaths: []string{"stderr"},
+	}.Build(zap.AddCaller(), zap.AddCallerSkip(1))
+	if err != nil {
+		return errors.Wrap(err, "initializing zap logger")
+	}
+
+	z = z.With(
+		zap.String("service", cfg.ServiceName),
+		zap.String("version.git_sha", GitSHA),
+		zap.String("env", cfg.Env),
+	)
+	// zl := bestirlog.WrapZap(z)
+
+	// Intitialize tracing
+
+	/*
+		if !cfg.Datadog.Disable {
+			// Configure tracing
+		}
+	*/
+
+	// Migrate - issa broken Luigi
+	// if err := goose.EnsureMigrations(ctx, zl, goose.Config{
+	// 	User:     cfg.Database.User,
+	// 	Password: cfg.Database.Pass,
+	// 	Port:     cfg.Database.Port,
+	// 	Host:     cfg.Database.Host,
+	// 	DryRun:   !cfg.Migration.Enable,
+	// 	Name:     cfg.Database.DBName,
+	// }); err != nil {
+	// 	return err
+	// }
 
 	db, err := database.Open(database.Config{
 		User:     cfg.Database.User,
@@ -101,6 +152,37 @@ func run(ctx context.Context, _ []string) error {
 		// zl.Info(ctx, "stopping database")
 		db.Close()
 	}()
+
+	// func dsn(dbName string) string {
+	// 	return fmt.Sprintf("%s:%s@tcp(%s)/%s", username, password, hostname, dbName)
+	// }
+
+	// db, err := sql.Open("mysql", dsn(""))
+	/*
+		db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", cfg.Database.User, cfg.Database.Pass, cfg.Database.Host, ""))
+		if err != nil {
+			log.Printf("Error %s when opening DB\n", err)
+			return err
+		}
+		defer db.Close()
+	*/
+	// needs cleaner implementation, logic should be moved elsewhere
+	// query := `CREATE TABLE IF NOT EXISTS account (
+	// 		id CHAR(36) NOT NULL,
+	// 		[name] VARCHAR(255) NOT NULL,
+	// 		PRIMARY KEY (id)
+	// 	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;`
+	//
+	// ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+	// defer cancelfunc()
+	// // _, err = db.ExecContext(ctx, query)
+	// _, err = db.Exec(query)
+	// if err != nil {
+	// 	log.Printf("Error %s when creating product table", err)
+	// 	return err
+	// }
+	// log.Println("successfuly created Account table")
+	//*/
 
 	// If DD is enabled, configure db to send stats info
 	//if !cfg.Datadog.Disable {

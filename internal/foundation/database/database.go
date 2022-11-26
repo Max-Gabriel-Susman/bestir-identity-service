@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/gocraft/dbr/v2"
@@ -30,6 +31,7 @@ func Open(cfg Config, serviceName string) (*sql.DB, error) {
 		sqltrace.WithAnalytics(true),
 	)
 	dsn := DSN(cfg)
+	log.Println(fmt.Sprintf("dsn is: %s", dsn))
 	return sqltrace.Open("mysql", dsn)
 }
 
@@ -38,7 +40,7 @@ func NewDBR(db *sql.DB) *dbr.Connection {
 }
 
 func DSN(cfg Config) string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?%s", cfg.User, cfg.Password, cfg.Host, cfg.Name, cfg.Params)
+	return fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?%s", cfg.User, cfg.Password, cfg.Host, cfg.Name, cfg.Params)
 }
 
 // StatusCheck returns nil if it can successfully talk to the database. It
