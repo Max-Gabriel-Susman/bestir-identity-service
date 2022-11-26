@@ -1,9 +1,17 @@
 package account
 
+import (
+	"github.com/google/uuid"
+)
+
 type Account struct {
-	// ID      uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()"`
-	ID      int
-	Balance int
+	ID   uuid.UUID `db:"id" json:"id"`
+	Name string    `db:"name" json:"name"`
+}
+
+type IncomingAccount struct {
+	Name string `json:"name" required:"true"`
+	// IdempotencyKey null.String `json:"-" db:"idempotency_key"`
 }
 
 type AccountGroup struct {

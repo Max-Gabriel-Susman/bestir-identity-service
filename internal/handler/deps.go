@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/jackc/pgx/v4"
+	"database/sql"
 )
 
 type Deps struct {
 	// Logger // must have do eet
-	Conn *pgx.Conn
+	// Conn *pgx.Conn
+	DB *sql.DB
 }

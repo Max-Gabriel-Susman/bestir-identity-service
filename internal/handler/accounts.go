@@ -26,30 +26,45 @@ func AccountEndpoints(app *web.App, api *account.API) {
 	ag := accountGroup{API: api}
 
 	// app.Handle("GET", "/accounts", ag.ListAccounts)
-	app.Handle("GET", "/", ag.ListAccounts)
+	app.Handle("GET", "/accounts", ag.ListAccounts)
+	app.Handle("POST", "/account", ag.CreateAccount)
 }
 
 func (ag accountGroup) ListAccounts(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	fmt.Println("ListAccounts invoked")
-	// accounts, err := ag.API.ListAccounts(ag.API.Store.Conn)
-	// if err != nil {
-	// 	return err
-	// }
-	accounts := []account.Account{
-		{
-			ID:      69,
-			Balance: 69,
-		},
-		{
-			ID:      420,
-			Balance: 420,
-		},
+	accounts, err := ag.API.ListAccounts(ctx)
+	if err != nil {
+		return err
 	}
 
-	fmt.Println("you got dem accounts fella")
 	return web.Respond(ctx, w, ListAccountsResponse{
 		Accounts: accounts,
 	}, http.StatusOK)
+}
+
+// accounts := []account.Account{
+// 	{
+// 		ID:      69,
+// 		Balance: 69,
+// 	},
+// 	{
+// 		ID:      420,
+// 		Balance: 420,
+// 	},
+// }
+
+func (ag accountGroup) CreateAccount(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	fmt.Println("Create Account a invoked")
+	var input account.IncomingAccount
+	if err := web.Decode(r.Body, &input); err != nil {
+		return err
+	}
+
+	account, err := ag.API.CreateAccount(ctx, input)
+	if err != nil {
+		return err
+	}
+
+	return web.Respond(ctx, w, account, http.StatusCreated)
 }
 
 func (ag accountGroup) GetAccount(ctx context.Context, w http.ResponseWriter, r *http.Request) error {

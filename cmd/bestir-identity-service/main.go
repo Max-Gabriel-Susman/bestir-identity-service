@@ -3,17 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
-	"github.com/Max-Gabriel-Susman/bestir-identity-service/db"
 	"github.com/Max-Gabriel-Susman/bestir-identity-service/internal/foundation/database"
 	"github.com/Max-Gabriel-Susman/bestir-identity-service/internal/handler"
 	env "github.com/caarlos0/env/v6"
-	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 )
 
@@ -26,12 +23,7 @@ const (
 	exitCodeInterrupt = 2
 )
 
-func spain() {
-	db.PGXSeed()
-}
-
 func main() {
-	fmt.Println("main invoked")
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	signalChan := make(chan os.Signal, 1)
@@ -75,12 +67,12 @@ func run(ctx context.Context, _ []string) error {
 		ServiceName string `env:"SERVICE_NAME" envDefault:"bp-billing-service"`
 		Env         string `env:"ENV" envDefault:"local"`
 		Database    struct {
-			User   string `env:"BESTIR_IDENTITY_DB_USER,required"`
-			Pass   string `env:"BESTIR_IDENTITY_DB_PASSWORD,required"`
-			Host   string `env:"BESTIR_IDENTITY_DB_HOST"`
-			Port   string `env:"BESTIR_DB_PORT" envDefault:"3306"`
-			DBName string `env:"BESTIR_DB_Name" envDefault:"identity"`
-			Params string `env:"BESTIR_DB_Param_Overrides" envDefault:"parseTime=true"`
+			User   string `env:"IDENTITY_DB_USER,required"`
+			Pass   string `env:"IDENTITY_DB_PASSWORD,required"`
+			Host   string `env:"IDENTITY_DB_HOST"`
+			Port   string `env:"IDENTITY_DB_PORT" envDefault:"3306"`
+			DBName string `env:"IDENTITY_DB_Name" envDefault:"identity"`
+			Params string `env:"IDENTITY_DB_Param_Overrides" envDefault:"parseTime=true"`
 		}
 		Datadog struct {
 			Disable bool `env:"DD_DISABLE"`
@@ -110,46 +102,34 @@ func run(ctx context.Context, _ []string) error {
 		db.Close()
 	}()
 
-	// Read in connection string
-	config, err := pgx.ParseConfig(os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	config.RuntimeParams["application_name"] = "$ docs_simplecrud_gopgx"
-	conn, err := pgx.ConnectConfig(context.Background(), config)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close(context.Background())
-
 	// If DD is enabled, configure db to send stats info
-	if !cfg.Datadog.Disable {
-		// statsdAddress := ddAgentAddress(8125)
-		// statsd, err := statsd.New(statsdAddress, statsd.WithMaxBytesPerPayload(4096))
-		// if err != nil {
-		// 	return errors.Wrap(err, "could not start statsd client")
-		// }
-		// // Start Stats Reporting for db
-		// go func() {
-		// 	zl.Info(ctx, "Starting reporting DB metrics", zap.String("statsd.address", statsdAddress))
-		// 	defer zl.Info(ctx, "Stopped reporting DB metrics")
-		// 	sr := database.NewStatsReporter(db, statsd, zl)
+	//if !cfg.Datadog.Disable {
+	// statsdAddress := ddAgentAddress(8125)
+	// statsd, err := statsd.New(statsdAddress, statsd.WithMaxBytesPerPayload(4096))
+	// if err != nil {
+	// 	return errors.Wrap(err, "could not start statsd client")
+	// }
+	// // Start Stats Reporting for db
+	// go func() {
+	// 	zl.Info(ctx, "Starting reporting DB metrics", zap.String("statsd.address", statsdAddress))
+	// 	defer zl.Info(ctx, "Stopped reporting DB metrics")
+	// 	sr := database.NewStatsReporter(db, statsd, zl)
 
-		// 	sr.ReportDBStats(ctx, []string{
-		// 		fmt.Sprintf("service:%s", cfg.ServiceName),
-		// 		fmt.Sprintf("version:%s", GitSHA),
-		// 		fmt.Sprintf("env:%s", cfg.Env),
-		// 		"collabs.squad:red",
-		// 	}, 1)
-		// }()
-	}
+	// 	sr.ReportDBStats(ctx, []string{
+	// 		fmt.Sprintf("service:%s", cfg.ServiceName),
+	// 		fmt.Sprintf("version:%s", GitSHA),
+	// 		fmt.Sprintf("env:%s", cfg.Env),
+	// 		"collabs.squad:red",
+	// 	}, 1)
+	// }()
+	//}
 
 	// CLIENTS N SHIT
 
 	// event bridge shit
 
 	// we gott reconfigure the service to use pgx now
-	h := handler.API(handler.Deps{Conn: conn})
+	h := handler.API(handler.Deps{DB: db})
 
 	// Start API Service
 	api := http.Server{
