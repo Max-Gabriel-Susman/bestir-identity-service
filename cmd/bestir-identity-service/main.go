@@ -76,7 +76,7 @@ func run(ctx context.Context, _ []string) error {
 
 	// cfg and setup shit right hurr, we gotta alter it for my database setup
 	var cfg struct {
-		ServiceName string `env:"SERVICE_NAME" envDefault:"bp-billing-service"`
+		ServiceName string `env:"SERVICE_NAME" envDefault:"bestir-identity-service"`
 		Env         string `env:"ENV" envDefault:"local"`
 		Database    struct {
 			User   string `env:"IDENTITY_DB_USER,required"`
