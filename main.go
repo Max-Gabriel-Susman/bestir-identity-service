@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Max-Gabriel-Susman/bestir-identity-service/db"
 	"github.com/Max-Gabriel-Susman/bestir-identity-service/internal/foundation/database"
 	"github.com/Max-Gabriel-Susman/bestir-identity-service/internal/handler"
 	env "github.com/caarlos0/env/v6"
@@ -30,10 +29,6 @@ const (
 	exitCodeErr       = 1
 	exitCodeInterrupt = 2
 )
-
-func spain() {
-	db.InitializeDB()
-}
 
 func main() {
 	ctx := context.Background()
@@ -218,7 +213,7 @@ func run(ctx context.Context, _ []string) error {
 	api := http.Server{
 		Handler: h,
 		// Addr:              "127.0.0.1:80",
-		Addr:              "0.0.0.0:80",
+		Addr:              "0.0.0.0:8080",
 		ReadHeaderTimeout: 2 * time.Second,
 	}
 
